@@ -7,7 +7,7 @@ Serverless implementation of the [Hanzi to Pinyin](https://www.npmjs.com/package
 * Clone repository
 * Run `npm install`
 * Run `npm start`
-* Visit http://localhost:3000/pinyin/%E6%88%91%E7%9A%84%E7%8C%AB%E5%96%9C%E6%AC%A2%E5%90%83%E8%8B%B9%E6%9E%9C in a browser.
+* Visit http://localhost:3000/pinyin/我的猫喜欢吃苹果 in a browser.
 
 ## Deploy to AWS
 * Create a `.nmprc` file as follows:
