@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "fs-extra": "^9.0.1",
+    "hanzi-to-pinyin": "^1.62.0"
+  },
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  }
+}

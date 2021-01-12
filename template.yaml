@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Pinyin API
+  
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  PinyinFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Layers:
+        - !Ref PinyinDependencies
+      Runtime: nodejs12.x
+      MemorySize: 1028
+      Events:
+        PinyinApi:
+          Type: HttpApi
+          Properties:
+            Path: /pinyin/{text}
+            Method: get
+  PinyinDependencies:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: pinyin-dependencies
+      Description: Dependencies for Pinyin API app
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - nodejs12.x
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+
+Outputs:
+  # ServerlessHttpApi is an implicit API created out of Events key under Serverless::Function
+  PinyinApi:
+    Description: "Endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/pinyin/"
