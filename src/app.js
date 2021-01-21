@@ -14,6 +14,10 @@ if (fs.pathExistsSync(DB_DIR)) {
 
 exports.handler = async (event) => {
   let result;
+  if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
+    result = { statusCode: 204 };
+    return utils.cors(result, event);
+  }  
   await convert.init('/tmp/cedict_db');
   try {
     switch (event.routeKey) {

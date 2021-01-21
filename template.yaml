@@ -7,9 +7,30 @@ Globals:
     Timeout: 30
 
 Resources:
+  PinyinApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          JWTAuthorizer:
+            IdentitySource: '$request.header.Authorization'
+            JwtConfiguration: 
+              audience: 
+              - ExlCloudApp:!~test
+              issuer: https://apps01.ext.exlibrisgroup.com/auth
+            Name: JwtAuthorizer 
+        # Uncomment this line to use the JWT authorizer for all routes
+        # DefaultAuthorizer: JWTAuthorizer  
+      CorsConfiguration:
+        AllowOrigins:
+          - "https://apps01.ext.exlibrisgroup.com"
+          - "http://localhost:4200"
+        AllowHeaders: [authorization, content-type]
+        AllowMethods: [GET, OPTIONS]
+        AllowCredentials: True
+        MaxAge: 600
   PinyinFunction:
     Type: AWS::Serverless::Function
-    FunctionName: PinyinTransliteration
     Properties:
       CodeUri: src/
       Handler: app.handler
@@ -17,16 +38,18 @@ Resources:
         - !Ref PinyinDependencies
       Runtime: nodejs12.x
       MemorySize: 1028
+      FunctionName: PinyinTransliteration
       Events:
         PinyinApi:
           Type: HttpApi
           Properties:
+            ApiId: !Ref PinyinApi
             Path: /pinyin/{text}
             Method: get
   PinyinDependencies:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: pinyin-dependencies
+      LayerName: !Sub "${AWS::StackName}-Dependencies"
       Description: Dependencies for Pinyin API app
       ContentUri: dependencies/
       CompatibleRuntimes:
@@ -35,7 +58,6 @@ Resources:
       RetentionPolicy: Retain
 
 Outputs:
-  # ServerlessHttpApi is an implicit API created out of Events key under Serverless::Function
   PinyinApi:
     Description: "Endpoint URL"
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/pinyin/"
+    Value: !Sub "https://${PinyinApi}.execute-api.${AWS::Region}.amazonaws.com/pinyin/"
